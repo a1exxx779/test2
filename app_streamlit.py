@@ -20,7 +20,8 @@ import datetime
 import plotly.graph_objects as go
 import plotly.express as px
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types as genai_types
 
 # ─────────────────────────────────────────────────────────────
 # CONFIGURARE PAGINĂ
@@ -363,14 +364,7 @@ with tab2:
             st.warning("⚠️ Introduceți cheia API Gemini în sidebar pentru a genera rapoarte.")
 
         if generate_btn and api_key:
-            genai.configure(api_key=api_key)
-            llm = genai.GenerativeModel(
-                model_name='gemini-1.5-flash-latest',
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.0,  # Strict factual — fără halucinații!
-                    max_output_tokens=1500
-                )
-            )
+            client = genai.Client(api_key=api_key)
 
             prompt = f"""Ești un analist SOC senior specializat în conformitate NIS2 pentru sectorul Sănătate din România.
 Generează un raport oficial de incident de securitate cibernetică conform Directivei NIS2 (UE 2022/2555).
@@ -394,7 +388,14 @@ Măsuri de Răspuns, Conformitate EU AI Act."""
 
             with st.spinner("⏳ Gemini generează raportul NIS2... (temperature=0.0)"):
                 try:
-                    response = llm.generate_content(prompt)
+                    response = client.models.generate_content(
+                        model='gemini-2.0-flash',
+                        contents=prompt,
+                        config=genai_types.GenerateContentConfig(
+                            temperature=0.0,
+                            max_output_tokens=1500
+                        )
+                    )
                     report_text = response.text
                     st.session_state['nis2_report'] = report_text
 
