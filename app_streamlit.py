@@ -110,9 +110,14 @@ st.markdown("""
 with st.sidebar:
     st.header("⚙️ Configurare")
 
-    # Cheie API — din Secrets (Streamlit Cloud) sau input manual
-    # SECURITATE: Nu hardcoda cheia în cod!
-    api_key = os.environ.get("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
+    # Cheie API — din variabile de mediu, Secrets sau input manual
+    # SECURITATE: Nu hardcoda cheia în cod! (Regula de Aur ISRA 2026)
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
+        except Exception:
+            api_key = ""  # Fișierul secrets.toml nu există — fallback la input manual
     if not api_key:
         api_key = st.text_input(
             "🔑 Gemini API Key",
@@ -360,10 +365,10 @@ with tab2:
         if generate_btn and api_key:
             genai.configure(api_key=api_key)
             llm = genai.GenerativeModel(
-                model_name='gemini-2.0-flash',
+                model_name='gemini-1.5-flash',
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.0,  # Strict factual — fără halucinații!
-                    max_output_tokens=2048
+                    max_output_tokens=1500
                 )
             )
 
