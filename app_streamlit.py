@@ -365,7 +365,7 @@ with tab2:
         if generate_btn and api_key:
             genai.configure(api_key=api_key)
             llm = genai.GenerativeModel(
-                model_name='gemini-1.5-flash',
+                model_name='gemini-1.5-flash-latest',
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.0,  # Strict factual — fără halucinații!
                     max_output_tokens=1500
